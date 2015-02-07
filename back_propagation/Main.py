@@ -6,7 +6,7 @@ import random
 
 import NeuralNetwork as NN
 
-TRAIN_N = 10000
+TRAIN_N = 1000
 DATA_N = 10000
 
 def main(ws):
@@ -26,7 +26,7 @@ def main(ws):
             xs.append(random.randint(0, 200) / 10 - 10)
         data_l.append((xs, [function(ws, xs)]))
 
-    neuron = NN.NeuralNetwork(n, 12, 1, 0.2, 0.1)
+    neuron = NN.NeuralNetwork(n, 8, 1, 0.2, 0.1)
     neuron.train(train_l)
 
     count = 0

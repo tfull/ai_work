@@ -15,11 +15,11 @@ class NeuralNetwork:
         self.eta = eta
         self.sa_m = [[R.random() for j in range(a_n)] for i in range(s_n)]
         self.ar_m = [[R.random() for j in range(r_n)] for i in range(a_n)]
-# self.wa = [[- R.random() for i in range(a_n)]]
-#self.wr = [[- R.random() for i in range(r_n)]]
+        self.wa = [- R.random() for i in range(a_n)]
+        self.wr = [- R.random() for i in range(r_n)]
 
-    def function(self, ws, xs):
-        return sigmoid(sum([w * x for (w, x) in zip(ws, xs)]) - self.theta)
+    def function(self, ws, xs, c):
+        return sigmoid(sum([w * x for (w, x) in zip(ws, xs)]) + c)
 
     def train(self, train_l):
 
@@ -33,19 +33,21 @@ class NeuralNetwork:
             for r_i in range(self.r_n):
                 for a_i in range(self.a_n):
                     self.ar_m[a_i][r_i] += self.eta * delta(ts, os, r_i) * hs[a_i]
+                self.wr[r_i] = self.eta * delta(ts, os, r_i)
 
             for a_i in range(self.a_n):
                 for s_i in range(self.s_n):
                     self.sa_m[s_i][a_i] += self.eta * hs[a_i] * (1 - hs[a_i]) * sum([self.ar_m[a_i][r_i] * delta(ts, os, r_i) for r_i in range(self.r_n)]) * xs[s_i]
+                self.wa[a_i] = self.eta * hs[a_i] * (1 - hs[a_i]) * sum([self.ar_m[a_i][r_i] * delta(ts, os, r_i) for r_i in range(self.r_n)])
 
     def connect(self, xs):
         hs = [0 for i in range(self.a_n)]
         os = [0 for i in range(self.r_n)]
 
         for a_i in range(self.a_n):
-            hs[a_i] = self.function([self.sa_m[i][a_i] for i in range(self.s_n)], xs)
+            hs[a_i] = self.function([self.sa_m[i][a_i] for i in range(self.s_n)], xs, self.wa[a_i])
         for r_i in range(self.r_n):
-            os[r_i] = self.function([self.ar_m[i][r_i] for i in range(self.a_n)], hs)
+            os[r_i] = self.function([self.ar_m[i][r_i] for i in range(self.a_n)], hs, self.wa[r_i])
 
         return (os, hs)
 
